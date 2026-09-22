@@ -27,7 +27,7 @@ jobs:
           {
               consoleDemoInit();
 
-              int x = 0;
+              int started = 0;
 
               while (1)
               {
@@ -37,35 +37,35 @@ jobs:
                   consoleClear();
 
                   iprintf("\n\n");
-                  iprintf("      ADRIANO DS\n");
+                  iprintf("       ADRIANO DS\n");
                   iprintf("\n");
-                  iprintf("   PROTOTYPE JOUABLE\n");
+                  iprintf("    PROTOTYPE JOUABLE\n");
                   iprintf("\n\n");
 
-                  if (x == 0)
+                  if (!started)
                   {
-                      iprintf("   NOUVELLE PARTIE\n");
+                      iprintf("    NOUVELLE PARTIE\n");
                       iprintf("\n");
-                      iprintf("   Appuie sur A\n");
+                      iprintf("    Appuie sur A\n");
                   }
                   else
                   {
-                      iprintf("   ADRIANO - NUMERO 10\n");
+                      iprintf("    ADRIANO\n");
                       iprintf("\n");
-                      iprintf("   ELEMENT : GLACE\n");
+                      iprintf("    Numero 10\n");
+                      iprintf("    Element : GLACE\n");
                       iprintf("\n");
-                      iprintf("   ECLAT POLAIRE\n");
+                      iprintf("    Eclat Polaire\n");
                       iprintf("\n");
-                      iprintf("   STYLET : DEPLACEMENT\n");
-                      iprintf("\n");
-                      iprintf("   B : RETOUR\n");
+                      iprintf("    A : technique\n");
+                      iprintf("    B : retour");
                   }
 
                   if (keys & KEY_A)
-                      x = 1;
+                      started = 1;
 
                   if (keys & KEY_B)
-                      x = 0;
+                      started = 0;
 
                   swiWaitForVBlank();
               }
@@ -75,15 +75,13 @@ jobs:
           EOF
 
           cat > Makefile <<'EOF'
-          include $(DEVKITARM)/ds_rules
-
-          TARGET := AdrianoPrototype
-          BUILD := build
-
+          TARGET  := AdrianoPrototype
+          BUILD   := build
           SOURCES := source
 
-          CFLAGS := -g -Wall -O2 -ffunction-sections \
-                    -march=arm9 -mtune=arm946e-s
+          ARCH := -march=arm9 -mtune=arm946e-s
+
+          CFLAGS := -g -Wall -O2 -ffunction-sections $(ARCH)
 
           LIBS := -lnds9
 
