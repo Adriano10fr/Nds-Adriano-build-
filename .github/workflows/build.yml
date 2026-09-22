@@ -1,0 +1,103 @@
+name: Build Adriano DS
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: devkitpro/devkitarm:latest
+
+    steps:
+      - name: Recuperer le projet
+        uses: actions/checkout@v4
+
+      - name: Creer le projet DS
+        run: |
+          mkdir -p source
+
+          cat > source/main.c <<'EOF'
+          #include <nds.h>
+          #include <stdio.h>
+
+          int main(void)
+          {
+              consoleDemoInit();
+
+              int x = 0;
+
+              while (1)
+              {
+                  scanKeys();
+                  int keys = keysDown();
+
+                  consoleClear();
+
+                  iprintf("\n\n");
+                  iprintf("      ADRIANO DS\n");
+                  iprintf("\n");
+                  iprintf("   PROTOTYPE JOUABLE\n");
+                  iprintf("\n\n");
+
+                  if (x == 0)
+                  {
+                      iprintf("   NOUVELLE PARTIE\n");
+                      iprintf("\n");
+                      iprintf("   Appuie sur A\n");
+                  }
+                  else
+                  {
+                      iprintf("   ADRIANO - NUMERO 10\n");
+                      iprintf("\n");
+                      iprintf("   ELEMENT : GLACE\n");
+                      iprintf("\n");
+                      iprintf("   ECLAT POLAIRE\n");
+                      iprintf("\n");
+                      iprintf("   STYLET : DEPLACEMENT\n");
+                      iprintf("\n");
+                      iprintf("   B : RETOUR\n");
+                  }
+
+                  if (keys & KEY_A)
+                      x = 1;
+
+                  if (keys & KEY_B)
+                      x = 0;
+
+                  swiWaitForVBlank();
+              }
+
+              return 0;
+          }
+          EOF
+
+          cat > Makefile <<'EOF'
+          include $(DEVKITARM)/ds_rules
+
+          TARGET := AdrianoPrototype
+          BUILD := build
+
+          SOURCES := source
+
+          CFLAGS := -g -Wall -O2 -ffunction-sections \
+                    -march=arm9 -mtune=arm946e-s
+
+          LIBS := -lnds9
+
+          include $(DEVKITARM)/ds_rules
+          EOF
+
+      - name: Compiler
+        run: make
+
+      - name: Verifier le NDS
+        run: test -s AdrianoPrototype.nds
+
+      - name: Recuperer le jeu
+        uses: actions/upload-artifact@v4
+        with:
+          name: AdrianoPrototype
+          path: AdrianoPrototype.nds
